@@ -100,4 +100,119 @@ class As_Ajax_Contact_Form_Admin {
 
 	}
 
+	/**
+     * Add new custom post type
+     *
+     * @since    1.0.0
+     */
+    public function create_new_cpt()
+    {
+    	$cpts = ['Contact']; 
+
+    	foreach ($cpts as $cpt) 
+    	{
+    		$sanitizedCptName = str_replace(' ', '_', strtolower($cpt));
+	        $last_character = substr($cpt, -1);
+	        if ($last_character === 'y') {
+	            $plural = substr_replace($cpt, 'ies', -1);
+	        }
+	        else {
+	            $plural = $cpt.'s'; // add 's' to convert singular name to plural
+	        }
+
+	        /* Capitalize first letter of each word */
+	        $plural = ucwords($plural);
+
+
+	        $textdomain = strtolower($cpt);
+	        $cap_type = 'post';
+
+			/* Capitalize first letter of each word */
+	        $single = ucwords($cpt);
+
+	            $opts['can_export'] = TRUE;
+	            // add user role's capabilities
+	            //$opts['capability_type'] = array('marketing','marketings');
+	            $opts['map_meta_cap'] = TRUE;
+	            // add user role's capabilities
+	            $opts['description'] = '';
+	            $opts['exclude_from_search'] = FALSE;
+	            $opts['has_archive'] = TRUE;        // Enable 'Post type' archive page
+	            $opts['hierarchical'] = FALSE;
+	            $opts['menu_icon'] = 'dashicons-chart-line';
+	            $opts['menu_position'] = 20;
+	            $opts['public'] = TRUE;
+	            $opts['publicly_querable'] = TRUE;
+	            $opts['query_var'] = TRUE;
+	            $opts['register_meta_box_cb'] = '';
+	            $opts['rewrite'] = FALSE;
+	            $opts['show_in_admin_bar'] = TRUE;  // 'Top Menu' bar
+	            $opts['show_in_menu'] = TRUE;
+	            $opts['show_in_nav_menu'] = FALSE;
+	            $opts['show_ui'] = TRUE;
+	            $opts['supports'] = FALSE;
+	            $opts['taxonomies'] = array();
+	            $opts['capabilities']['delete_others_posts'] = "delete_others_{$cap_type}s";
+	            $opts['labels']['add_new'] = __( "Add New {$single}", $textdomain );
+	            $opts['labels']['add_new_item'] = __( "Add New {$single}", $textdomain );
+	            $opts['labels']['all_items'] = __( 'All ' .$plural, $textdomain );
+	            $opts['labels']['edit_item'] = __( "Edit {$single}" , $textdomain);
+	            $opts['labels']['menu_name'] = __( $plural, $textdomain );
+	            $opts['labels']['name'] = __( $plural, $textdomain );
+	            $opts['labels']['name_admin_bar'] = __( $single, $textdomain );
+	            $opts['labels']['new_item'] = __( "New {$single}", $textdomain );
+	            $opts['labels']['not_found'] = __( "No {$plural} Found", $textdomain );
+	            $opts['labels']['not_found_in_trash'] = __( "No {$plural} Found in Trash", $textdomain );
+	            $opts['labels']['parent_item_colon'] = __( "Parent {$plural} :", $textdomain );
+	            $opts['labels']['search_items'] = __( "Search {$plural}", $textdomain );
+	            $opts['labels']['singular_name'] = __( $single, $textdomain );
+	            $opts['labels']['view_item'] = __( "View {$single}", $textdomain );
+	            $opts['rewrite']['ep_mask'] = EP_PERMALINK;
+	            $opts['rewrite']['feeds'] = FALSE;
+	            $opts['rewrite']['pages'] = TRUE;
+	            $opts['rewrite']['slug'] = __( strtolower( $single ), $textdomain );
+	            $opts['rewrite']['with_front'] = FALSE;
+	        register_post_type( $sanitizedCptName, $opts );
+    	}
+    }
+
+
+
+	/**
+	 * Add setting page in wp admin area
+	 *
+	 * @since    1.0.0
+	 * @param      string    $plugin_name    The name of this plugin.
+	 * ref - https://developer.wordpress.org/plugins/settings/custom-settings-page/
+	 */
+	function create_new_setting_page_for_plugin() {
+	    add_submenu_page(
+	    	'edit.php?post_type=contact', 
+	    	ucfirst(str_replace('-', ' ', $this->plugin_name)).' Admin', 
+	    	'Settings', // Menu Title
+	    	'edit_posts', basename(__FILE__), 
+	    	array($this, 'as_ajax_contact_form_options_page') // Callback function
+	    );
+	}
+
+	// If want to display custom setting page with in setting tab, than uncomment this function
+	/*function create_new_setting_page_for_plugin() {
+	    add_options_page(
+	        'My Plugin Title',
+	        ucfirst(str_replace('-', ' ', $this->plugin_name)). ' Settings', // Menu Title
+	        'publish_posts',
+	        $this->plugin_name.'-setting',									// menu slug
+	        array($this, 'as_ajax_contact_form_options_page') // Callback function
+	    );
+	}*/
+
+	function as_ajax_contact_form_options_page() {
+	    ?>
+	    <div class="wrap">
+	        <h2><?php echo ucfirst(str_replace('-', ' ', $this->plugin_name)) ?> Options</h2>
+	        your form goes here
+	    </div>
+	    <?php
+	}
+
 }
